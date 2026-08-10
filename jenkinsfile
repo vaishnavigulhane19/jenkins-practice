@@ -1,4 +1,3 @@
-```groovy
 pipeline {
     agent {
         label "worker"
@@ -36,4 +35,3 @@ pipeline {
         }
     }
 }
-```
