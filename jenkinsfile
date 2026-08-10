@@ -1,0 +1,39 @@
+```groovy
+pipeline {
+    agent {
+        label "worker"
+    }
+
+    tools {
+        maven "maven"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/mayurpandit25/student-management.git'
+
+                sh '''
+                    echo "Checkout stage is successful"
+                '''
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+                    mvn clean package
+                    echo "Build is successful"
+                '''
+            }
+
+            post {
+                success {
+                    archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
+                }
+            }
+        }
+    }
+}
+```
