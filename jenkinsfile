@@ -1,46 +1,34 @@
 pipeline {
     agent {
-        label "worker"
+        label 'worker'
     }
-
-    environment {
-        my_aws_credentials = credentials('aws-access')
-    }
-
     tools {
-        maven "maven"
+        maven 'maven'
     }
-
     stages {
-        stage('checkout'){
+        stage ('checkout') {
             steps {
                 git 'https://github.com/mayurpandit25/student-management.git'
                 sh '''
-                echo "clonning is successful"
+                echo "hello jenkins"
                 '''
             }
         }
 
-        stage('Build'){
+        stage ('Build') {
             steps {
                 sh '''
-                mvn clean package
-                echo "build is successful"
+                mvn clean package 
+                echo " build is successfull"
                 '''
-            }
-            post {
-                success {
-                    archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
-                }
             }
         }
 
-        stage('Artifact to S3'){
-            steps {
-                sh '''
-                aws s3 cp target/*.war s3://mayurcbz.space/Artifact/student.war
-                '''
+        post {
+            success {
+                archiveArtifacts artifacts: '***/target/*.jar', fingerprint: true
             }
         }
+
     }
 }
