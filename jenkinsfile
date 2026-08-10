@@ -10,7 +10,7 @@ pipeline {
             steps {
                 git 'https://github.com/mayurpandit25/student-management.git'
                 sh '''
-                echo "hello jenkins"
+                echo "hello jenkins dear"
                 '''
             }
         }
