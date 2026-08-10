@@ -2,33 +2,37 @@ pipeline {
     agent {
         label 'worker'
     }
+
     tools {
         maven 'maven'
     }
+
     stages {
-        stage ('checkout') {
+
+        stage('Checkout') {
             steps {
                 git 'https://github.com/mayurpandit25/student-management.git'
+
                 sh '''
-                echo "hello jenkins dear"
+                    echo "hello hi jenkins"
                 '''
             }
         }
 
-        stage ('Build') {
+        stage('Build') {
             steps {
                 sh '''
-                mvn clean package 
-                echo " build is successfull"
+                    mvn clean package
+                    echo "build is done and successful"
                 '''
             }
         }
+    }
 
-        post {
-            success {
-                archiveArtifacts artifacts: '***/target/*.jar', fingerprint: true
-            }
+    post {
+        success {
+            archiveArtifacts artifacts: 'target/*.war', fingerprint: true
         }
-
     }
 }
+
