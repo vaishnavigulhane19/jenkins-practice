@@ -14,7 +14,7 @@ pipeline {
                 git 'https://github.com/mayurpandit25/student-management.git'
 
                 sh '''
-                    echo "hello hi jenkins"
+                    echo "hello jenkins"
                 '''
             }
         }
@@ -23,7 +23,7 @@ pipeline {
             steps {
                 sh '''
                     mvn clean package
-                    echo "build is done and successful"
+                    echo "build is successful"
                 '''
             }
         }
