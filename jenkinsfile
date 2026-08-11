@@ -2,6 +2,11 @@ pipeline {
     agent {
         label 'worker'
     }
+
+    environment {
+        my_aws_credentials = credentials('aws_access')
+    }
+
     tools {
         maven 'maven'
     }
@@ -23,6 +28,22 @@ pipeline {
                 sh '''
                     mvn clean package
                     echo "build is successful"
+                '''
+            }
+        }
+
+        stage('Artifact to S3') {
+            steps {
+                sh '''
+                    aws s3 cp target/*.war s3://deploywithnavi.space/Artifact/student.war
+                '''
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                sh '''
+                    mvn sonar:sonar
                 '''
             }
         }
