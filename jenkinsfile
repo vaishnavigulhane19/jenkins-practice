@@ -1,55 +1,46 @@
 pipeline {
     agent {
-        label "worker"
-    }
-
-    environment {
-        my_aws_credentials = credentials('aws-access')
+        label 'worker'
     }
 
     tools {
-        maven "maven"
+        maven 'maven'
     }
 
     stages {
-        stage('checkout'){
+
+        stage('Checkout') {
             steps {
-                git 'https://github.com/mayurpandit25/student-management.git'
+                git 'https://github.com/vaishnavigulhane19/jenkins-practice.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
                 sh '''
-                echo "clonning is successful"
+                    mvn clean package
+                    echo "build is successful"
                 '''
             }
         }
 
-        stage('Build'){
+        stage('Artifact to S3') {
             steps {
-                sh '''
-                mvn clean package
-                echo "build is successful"
-                '''
-            }
-            post {
-                success {
-                    archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding',
+                     credentialsId: 'aws-access']
+                ]) {
+                    sh '''
+                        aws s3 cp target/student-management.war s3://deploywithnavi.space/Artifact/student.war
+                    '''
                 }
             }
         }
 
-        stage('Artifact to S3'){
+        stage('SonarQube Analysis') {
             steps {
-                sh '''
-                aws s3 cp target/*.war s3://deploywithnavi.space/Artifact/student.war
-                '''
+                // your existing SonarQube commands
             }
         }
-
-           stage('SonarQube Analysis'){
-               steps {
-                   withSonarQubeEnv('sonar') {
-                     sh 'mvn sonar:sonar'
-                   } 
-               }
-           }
     }
 }
-
