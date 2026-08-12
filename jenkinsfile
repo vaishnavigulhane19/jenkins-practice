@@ -58,5 +58,33 @@ pipeline {
                 }
             }
         }
+
+        stage('SonarQube Quality Gates'){
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+
+        }
+
+        stage('Docker Build'){
+            steps {
+                sh '''
+                docker build -t student:latest .
+                docker images
+                '''
+            }
+        }
+
+        stage('Push Image To ECR'){
+            steps {
+                sh '''
+                aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 262349351040.dkr.ecr.ap-south-1.amazonaws.com
+                docker tag student:latest 262349351040.dkr.ecr.ap-south-1.amazonaws.com/student:latest
+                docker push 262349351040.dkr.ecr.ap-south-1.amazonaws.com/student:latest
+                '''
+            }
+        }    
     }
 }
