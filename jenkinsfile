@@ -3,6 +3,9 @@ pipeline {
         label "worker"
     }
 
+    ennvironment {
+        my_aws_credentials = credentials('aws-access')
+
     tools {
         maven "maven"
     }
@@ -36,14 +39,8 @@ pipeline {
 
         stage('Artifact to S3') {
             steps {
-                withCredentials([
-                    [$class: 'AmazonWebServicesCredentialsBinding',
-                     credentialsId: 'aws-access']
-                ]) {
                     sh '''
                         echo "Checking AWS credentials..."
-                        aws sts get-caller-identity
-
                         echo "Uploading WAR to S3..."
                         aws s3 cp target/*.war s3://deploywithnavi.space/Artifact/student.war
                     '''
