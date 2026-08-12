@@ -3,33 +3,31 @@ pipeline {
         label "worker"
     }
 
-    ennvironment {
+    environment {
         my_aws_credentials = credentials('aws-access')
+    }
 
     tools {
         maven "maven"
     }
 
     stages {
-
-        stage('Checkout') {
+        stage('checkout'){
             steps {
                 git 'https://github.com/mayurpandit25/student-management.git'
-
                 sh '''
-                    echo "cloning is successful"
+                echo "clonning is successful"
                 '''
             }
         }
 
-        stage('Build') {
+        stage('Build'){
             steps {
                 sh '''
-                    mvn clean package
-                    echo "build is successful"
+                mvn clean package
+                echo "build is successful"
                 '''
             }
-
             post {
                 success {
                     archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
@@ -37,22 +35,19 @@ pipeline {
             }
         }
 
-        stage('Artifact to S3') {
+        stage('Artifact to S3'){
             steps {
-                    sh '''
-                        echo "Checking AWS credentials..."
-                        echo "Uploading WAR to S3..."
-                        aws s3 cp target/*.war s3://deploywithnavi.space/Artifact/student.war
-                    '''
-                }
+                sh '''
+                aws s3 cp target/*.war s3://deploywithnavi.space/Artifact/student.war
+                '''
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('SonarQube Analysis'){
             steps {
                 withSonarQubeEnv('sonar') {
-                    sh 'mvn sonar:sonar'
-                }
+                  sh 'mvn sonar:sonar'
+                } 
             }
         }
 
@@ -62,7 +57,6 @@ pipeline {
                     waitForQualityGate abortPipeline: true
                 }
             }
-
         }
 
         stage('Docker Build'){
@@ -82,6 +76,6 @@ pipeline {
                 docker push 262349351040.dkr.ecr.ap-south-1.amazonaws.com/student:latest
                 '''
             }
-        }    
+        }
     }
 }
